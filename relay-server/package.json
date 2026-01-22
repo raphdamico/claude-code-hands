@@ -1,0 +1,14 @@
+{
+  "name": "vue-viz-relay",
+  "version": "1.0.0",
+  "description": "Relay server for Claude Vue Viz - bridges Claude Code hooks to Chrome extension",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+}

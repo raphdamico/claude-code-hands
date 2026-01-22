@@ -1,0 +1,28 @@
+{
+  "name": "claude-vue-viz",
+  "version": "0.1.0",
+  "description": "Visualize which Vue components Claude Code is reading and editing, directly in the browser",
+  "type": "module",
+  "bin": {
+    "claude-vue-viz": "./bin/cli.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "relay-server/index.js",
+    "relay-server/package.json"
+  ],
+  "dependencies": {
+    "ws": "^8.16.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "claude",
+    "vue",
+    "visualization",
+    "developer-tools"
+  ],
+  "license": "MIT"
+}
