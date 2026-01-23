@@ -1,21 +1,23 @@
-import Header from './components/Header.jsx'
-import Sidebar from './components/Sidebar.jsx'
-import Card from './components/Card.jsx'
+import AppHeader from './components/AppHeader';
+import Sidebar from './components/Sidebar';
+import BoardView from './components/BoardView';
 
 function App() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', fontFamily: 'system-ui, sans-serif' }}>
-      <Header />
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      minHeight: '100vh',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      background: '#f0f2f5',
+    }}>
+      <AppHeader />
       <div style={{ display: 'flex', flex: 1 }}>
         <Sidebar />
-        <main style={{ flex: 1, padding: '24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px', alignContent: 'start' }}>
-          <Card title="Getting Started" description="Set up Claude Hands to visualize component interactions in real time." />
-          <Card title="React Support" description="React 16+ components are detected via fiber nodes in development mode." />
-          <Card title="Vue Support" description="Vue 2 & 3 components are detected via __file in development mode." />
-        </main>
+        <BoardView />
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

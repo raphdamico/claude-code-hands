@@ -92,25 +92,25 @@ let demoActiveBtn = null;
 let demoTimeouts = [];
 
 const demoVueFiles = [
-  { filePath: 'src/components/Card.vue', operation: 'read', selector: '.card', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
-  { filePath: 'src/assets/styles.css', operation: 'edit', description: 'Editing: .card { border-radius: 8px;...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
-  { filePath: 'src/components/Header.vue', operation: 'read', selector: '.header', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
-  { filePath: 'src/utils/helpers.js', operation: 'read', description: 'Reading script...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
-  { filePath: 'src/components/Sidebar.vue', operation: 'edit', selector: '.sidebar', description: 'Editing: <template>\\n  <aside class...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
-  { filePath: 'src/components/Button.vue', operation: 'edit', selector: '.btn', description: 'Editing: <button :class="btnClass...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
-  { filePath: 'index.html', operation: 'read', description: 'Reading template...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
-  { filePath: 'src/App.vue', operation: 'read', selector: '.app', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/components/ChecklistItem.vue', operation: 'read', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/components/TaskCard.vue', operation: 'edit', description: 'Editing: <div class="task-card">...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
+  { filePath: 'src/data/boardData.js', operation: 'read', description: 'Reading data...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/components/Column.vue', operation: 'edit', description: 'Editing: <div class="column">...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
+  { filePath: 'src/components/Sidebar.vue', operation: 'read', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/components/CardFooter.vue', operation: 'edit', description: 'Editing: <div class="card-footer">...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
+  { filePath: 'src/components/AppHeader.vue', operation: 'read', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/App.vue', operation: 'read', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
 ];
 
 const demoReactFiles = [
-  { filePath: 'src/components/Header.jsx', operation: 'read', selector: 'header', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
-  { filePath: 'src/components/Card.jsx', operation: 'edit', selector: 'main > div', description: 'Editing: <h3>{title}</h3>...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
-  { filePath: 'src/components/Sidebar.jsx', operation: 'read', selector: 'aside', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
-  { filePath: 'src/App.jsx', operation: 'read', selector: '#root > div', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
-  { filePath: 'src/main.jsx', operation: 'read', description: 'Reading script...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
-  { filePath: 'src/components/Card.jsx', operation: 'edit', selector: 'main > div', description: 'Editing: style={{ borderRadius...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
-  { filePath: 'src/components/Header.jsx', operation: 'edit', selector: 'header', description: 'Editing: <nav style={{ marginLeft...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
-  { filePath: 'vite.config.js', operation: 'read', description: 'Reading config...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/components/AppHeader.jsx', operation: 'read', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/components/TaskCard.jsx', operation: 'edit', description: 'Editing: <CardLabel key={label.id}...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
+  { filePath: 'src/components/Checklist.jsx', operation: 'read', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/components/Column.jsx', operation: 'edit', description: 'Editing: <ColumnHeader title=...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
+  { filePath: 'src/data/boardData.js', operation: 'read', description: 'Reading data...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/components/ColumnHeader.jsx', operation: 'edit', description: 'Editing: fontSize: "13px"...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
+  { filePath: 'src/components/FilterChip.jsx', operation: 'read', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/App.jsx', operation: 'read', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
 ];
 
 function sendToContentScript(tabId, message) {
