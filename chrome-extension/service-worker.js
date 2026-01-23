@@ -1,7 +1,9 @@
 // Claude Hands - Service Worker
 // Maintains WebSocket connection to relay server and broadcasts to content scripts
 
-const WS_URL = 'ws://localhost:9528';
+// Default relay WebSocket port — must match lib/config.js
+const WS_PORT = 9528;
+const WS_URL = `ws://localhost:${WS_PORT}`;
 const RECONNECT_DELAYS = [1000, 2000, 4000, 8000, 16000, 30000];
 
 let ws = null;

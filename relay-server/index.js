@@ -1,8 +1,9 @@
 import http from 'http';
 import { WebSocketServer } from 'ws';
+import config from '../lib/config.js';
 
-const HTTP_PORT = 9527;
-const WS_PORT = 9528;
+const HTTP_PORT = config.relay.httpPort;
+const WS_PORT = config.relay.wsPort;
 
 // Track active operations and connected clients
 const activeOperations = new Map();
@@ -106,7 +107,7 @@ setInterval(() => {
 }, 30000);
 
 function handleEvent(event) {
-  const { type, filePath, operation, tool, sessionId, description, timestamp } = event;
+  const { type, filePath, operation, tool, sessionId, description, visual, timestamp } = event;
 
   // Normalize the file path for consistent matching
   const normalizedPath = normalizePath(filePath);
@@ -122,6 +123,7 @@ function handleEvent(event) {
       tool,
       sessionId,
       description,
+      visual,
       startTime: timestamp || Date.now()
     };
     activeOperations.set(operationKey, opData);

@@ -20,7 +20,7 @@ function updateUI(state) {
   // Update operations list
   if (state.operations && state.operations.length > 0) {
     operationsList.innerHTML = state.operations.map(op => {
-      const icon = op.operation === 'read' ? '👀' : '✍️';
+      const icon = (op.visual && op.visual.emoji) || (op.operation === 'read' ? '\u{1F441}\uFE0F' : '\u{1F91A}');
       const typeClass = op.operation;
       const fileName = op.normalizedPath || op.filePath.split('/').pop();
       return `
@@ -90,14 +90,14 @@ let demoRunning = false;
 let demoTimeouts = [];
 
 const demoFiles = [
-  { filePath: 'src/components/Card.vue', operation: 'read', selector: '.card', description: 'Reading component...' },
-  { filePath: 'src/assets/styles.css', operation: 'edit', description: 'Editing: .card { border-radius: 8px;...' },
-  { filePath: 'src/components/Header.vue', operation: 'read', selector: '.header', description: 'Reading component...' },
-  { filePath: 'src/utils/helpers.js', operation: 'read', description: 'Reading script...' },
-  { filePath: 'src/components/Sidebar.vue', operation: 'edit', selector: '.sidebar', description: 'Editing: <template>\\n  <aside class...' },
-  { filePath: 'src/components/Button.vue', operation: 'edit', selector: '.btn', description: 'Editing: <button :class="btnClass...' },
-  { filePath: 'index.html', operation: 'read', description: 'Reading template...' },
-  { filePath: 'src/App.vue', operation: 'read', selector: '.app', description: 'Reading component...' },
+  { filePath: 'src/components/Card.vue', operation: 'read', selector: '.card', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/assets/styles.css', operation: 'edit', description: 'Editing: .card { border-radius: 8px;...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
+  { filePath: 'src/components/Header.vue', operation: 'read', selector: '.header', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/utils/helpers.js', operation: 'read', description: 'Reading script...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/components/Sidebar.vue', operation: 'edit', selector: '.sidebar', description: 'Editing: <template>\\n  <aside class...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
+  { filePath: 'src/components/Button.vue', operation: 'edit', selector: '.btn', description: 'Editing: <button :class="btnClass...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
+  { filePath: 'index.html', operation: 'read', description: 'Reading template...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/App.vue', operation: 'read', selector: '.app', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
 ];
 
 function sendToContentScript(tabId, message) {
@@ -123,6 +123,7 @@ function runDemo(tabId) {
         operation: file.operation,
         selector: file.selector,
         description: file.description,
+        visual: file.visual,
       });
     }, delay);
     demoTimeouts.push(startTimeout);
@@ -135,6 +136,7 @@ function runDemo(tabId) {
         normalizedPath: file.filePath,
         operation: file.operation,
         selector: file.selector,
+        visual: file.visual,
       });
     }, delay + holdDuration);
     demoTimeouts.push(endTimeout);

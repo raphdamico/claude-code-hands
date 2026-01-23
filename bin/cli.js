@@ -2,6 +2,7 @@
 
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import config from '../lib/config.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -22,7 +23,7 @@ switch (command) {
   }
   case 'status': {
     try {
-      const res = await fetch('http://localhost:9527/status');
+      const res = await fetch(`http://localhost:${config.relay.httpPort}/status`);
       const data = await res.json();
       console.log('Relay server is running');
       console.log(`  WebSocket clients: ${data.wsClients}`);

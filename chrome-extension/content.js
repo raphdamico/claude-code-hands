@@ -172,13 +172,17 @@
      * Show indicator for a file operation — accumulates emoji per file
      */
     show(operation) {
-      const { filePath, normalizedPath, operation: opType, selector, description } = operation;
+      const { filePath, normalizedPath, operation: opType, selector, description, visual } = operation;
+
+      // Resolve visual metadata from event, with fallback defaults
+      const emoji = (visual && visual.emoji) || (opType === 'read' ? '\u{1F441}\uFE0F' : '\u{1F91A}');
+      const cssClass = (visual && visual.cssClass) || (opType === 'read' ? 'reading' : 'editing');
 
       const existing = this.overlays.get(normalizedPath);
 
       if (existing) {
         // Add another emoji to the existing overlay
-        this.addEmoji(normalizedPath, existing, opType);
+        this.addEmoji(normalizedPath, existing, emoji, cssClass);
         // Update speech bubble with new description
         if (description && this.speechBubbleEnabled) {
           this.updateSpeechBubble(existing, description);
@@ -196,7 +200,7 @@
       }
 
       // Create highlights for ALL matching elements
-      const highlightClass = opType === 'read' ? 'reading' : 'editing';
+      const highlightClass = cssClass;
       const highlights = elements.map(el => {
         const rect = el.getBoundingClientRect();
         const highlight = document.createElement('div');
@@ -233,7 +237,7 @@
       this.overlays.set(normalizedPath, entry);
 
       // Add the first emoji
-      this.addEmoji(normalizedPath, entry, opType);
+      this.addEmoji(normalizedPath, entry, emoji, cssClass);
 
       console.log('[Claude Hands] Showing indicator for:', filePath, opType, `(${elements.length} elements)`);
     },
@@ -241,8 +245,7 @@
     /**
      * Add an emoji to an existing overlay entry
      */
-    addEmoji(normalizedPath, entry, opType) {
-      const emoji = opType === 'read' ? '👁️' : '🤚';
+    addEmoji(normalizedPath, entry, emoji, cssClass) {
       const span = document.createElement('span');
       span.className = 'claude-hands-emoji';
       span.textContent = emoji;
@@ -257,8 +260,7 @@
       entry.emojis.push(emojiEntry);
 
       // Update highlight class on ALL highlights based on latest operation
-      const highlightClass = `claude-hands-highlight ${opType === 'read' ? 'reading' : 'editing'}`;
-      entry.highlights.forEach(h => { h.className = highlightClass; });
+      entry.highlights.forEach(h => { h.className = `claude-hands-highlight ${cssClass}`; });
     },
 
     /**
@@ -441,7 +443,11 @@
     },
 
     show(operation) {
-      const { filePath, normalizedPath, operation: opType, description } = operation;
+      const { filePath, normalizedPath, operation: opType, description, visual } = operation;
+
+      // Resolve visual metadata from event, with fallback defaults
+      const emoji = (visual && visual.emoji) || (opType === 'read' ? '\u{1F441}\uFE0F' : '\u{1F91A}');
+      const cssClass = (visual && visual.cssClass) || (opType === 'read' ? 'reading' : 'editing');
 
       const existing = this.entries.get(normalizedPath);
       if (existing) {
@@ -457,10 +463,10 @@
 
       // Show page-wide highlight if first entry
       if (this.entries.size === 0) {
-        this.showHighlight(opType);
+        this.showHighlight(cssClass);
       } else if (this.highlight) {
         // Update highlight class to latest operation
-        this.highlight.className = `claude-hands-global-highlight ${opType === 'read' ? 'reading' : 'editing'}`;
+        this.highlight.className = `claude-hands-global-highlight ${cssClass}`;
       }
 
       // Create panel if not visible
@@ -473,7 +479,6 @@
       // Add file entry
       const fileEntry = document.createElement('div');
       fileEntry.className = 'claude-hands-global-file-entry';
-      const emoji = opType === 'read' ? '👁️' : '🤚';
       const filename = filePath.split('/').pop();
       fileEntry.innerHTML = `<span class="claude-hands-global-emoji">${emoji}</span><span class="claude-hands-global-filename">${filename}</span>`;
 
@@ -509,9 +514,9 @@
       }, 300);
     },
 
-    showHighlight(opType) {
+    showHighlight(cssClass) {
       this.highlight = document.createElement('div');
-      this.highlight.className = `claude-hands-global-highlight ${opType === 'read' ? 'reading' : 'editing'}`;
+      this.highlight.className = `claude-hands-global-highlight ${cssClass}`;
       this.container.appendChild(this.highlight);
     },
 
