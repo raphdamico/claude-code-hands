@@ -1,4 +1,4 @@
-// Popup script for Claude Vue Viz
+// Popup script for Claude Hands
 
 const statusEl = document.getElementById('status');
 const statusText = document.getElementById('status-text');

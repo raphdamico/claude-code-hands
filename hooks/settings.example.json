@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/vue-viz-hook.sh"
+            "command": "~/.claude/hooks/claude-hands-hook.js"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/vue-viz-hook.sh"
+            "command": "~/.claude/hooks/claude-hands-hook.js"
           }
         ]
       }

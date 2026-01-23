@@ -1,14 +1,14 @@
-// Claude Vue Viz - Content Script
-// Scans Vue components and displays visual indicators
+// Claude Hands - Content Script
+// Scans components and displays visual indicators (Vue + React)
 
 (function() {
   'use strict';
 
   // ============================================
-  // Vue Component Scanner
+  // Component Scanner
   // ============================================
 
-  const VueScanner = {
+  const ComponentScanner = {
     knownComponents: [],
     lastScanTime: 0,
     SCAN_DEBOUNCE: 500,
@@ -40,7 +40,7 @@
 
     /**
      * Request a fresh scan from the MAIN-world script.
-     * The MAIN-world script marks elements with data-vue-viz-component attributes.
+     * The MAIN-world script marks elements with data-claude-hands-component attributes.
      */
     requestScan() {
       const now = Date.now();
@@ -48,7 +48,7 @@
         return;
       }
       this.lastScanTime = now;
-      window.dispatchEvent(new CustomEvent('vue-viz-scan-request'));
+      window.dispatchEvent(new CustomEvent('claude-hands-scan-request'));
     },
 
     /**
@@ -64,35 +64,35 @@
 
       // Query elements by exact normalized path
       let elements = Array.from(
-        document.querySelectorAll(`[data-vue-viz-component="${normalizedTarget}"]`)
+        document.querySelectorAll(`[data-claude-hands-component="${normalizedTarget}"]`)
       );
       if (elements.length > 0) {
-        console.log('[Vue Viz] Found elements via exact path:', normalizedTarget, elements.length);
+        console.log('[Claude Hands] Found elements via exact path:', normalizedTarget, elements.length);
         return elements;
       }
 
       // Try filename-only match
       const filenameSelector = targetFilename.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       elements = Array.from(
-        document.querySelectorAll('[data-vue-viz-component]')
+        document.querySelectorAll('[data-claude-hands-component]')
       ).filter(el => {
-        const comp = el.getAttribute('data-vue-viz-component');
+        const comp = el.getAttribute('data-claude-hands-component');
         return comp && comp.split('/').pop() === targetFilename;
       });
       if (elements.length > 0) {
-        console.log('[Vue Viz] Found elements via filename match:', targetFilename, elements.length);
+        console.log('[Claude Hands] Found elements via filename match:', targetFilename, elements.length);
         return elements;
       }
 
       // Partial path match
       elements = Array.from(
-        document.querySelectorAll('[data-vue-viz-component]')
+        document.querySelectorAll('[data-claude-hands-component]')
       ).filter(el => {
-        const comp = el.getAttribute('data-vue-viz-component');
+        const comp = el.getAttribute('data-claude-hands-component');
         return comp && (comp.endsWith(normalizedTarget) || normalizedTarget.endsWith(comp));
       });
       if (elements.length > 0) {
-        console.log('[Vue Viz] Found elements via partial path match:', normalizedTarget, elements.length);
+        console.log('[Claude Hands] Found elements via partial path match:', normalizedTarget, elements.length);
         return elements;
       }
 
@@ -100,12 +100,12 @@
       if (selector) {
         const els = document.querySelectorAll(selector);
         if (els.length > 0) {
-          console.log('[Vue Viz] Found elements via selector fallback:', selector);
+          console.log('[Claude Hands] Found elements via selector fallback:', selector);
           return Array.from(els);
         }
       }
 
-      console.log('[Vue Viz] No elements found for:', targetPath, '(normalized:', normalizedTarget + ')');
+      console.log('[Claude Hands] No elements found for:', targetPath, '(normalized:', normalizedTarget + ')');
       return [];
     }
   };
@@ -123,7 +123,7 @@
     init() {
       // Create overlay container
       this.container = document.createElement('div');
-      this.container.id = 'vue-viz-overlay-container';
+      this.container.id = 'claude-hands-overlay-container';
       this.container.style.cssText = 'position: absolute; top: 0; left: 0; pointer-events: none; z-index: 999998;';
       document.body.appendChild(this.container);
 
@@ -165,7 +165,7 @@
       window.addEventListener('scroll', () => this.updateAllPositions(), { passive: true });
       window.addEventListener('resize', () => this.updateAllPositions(), { passive: true });
 
-      console.log('[Vue Viz] Overlay initialized');
+      console.log('[Claude Hands] Overlay initialized');
     },
 
     /**
@@ -183,12 +183,12 @@
         if (description && this.speechBubbleEnabled) {
           this.updateSpeechBubble(existing, description);
         }
-        console.log('[Vue Viz] Added emoji for:', filePath, opType);
+        console.log('[Claude Hands] Added emoji for:', filePath, opType);
         return;
       }
 
       // Find matching DOM elements
-      const elements = VueScanner.findElements(filePath, selector);
+      const elements = ComponentScanner.findElements(filePath, selector);
       if (elements.length === 0) {
         // No matching DOM elements — show in global overlay instead
         GlobalOverlay.show(operation);
@@ -200,7 +200,7 @@
       const highlights = elements.map(el => {
         const rect = el.getBoundingClientRect();
         const highlight = document.createElement('div');
-        highlight.className = `vue-viz-highlight ${highlightClass}`;
+        highlight.className = `claude-hands-highlight ${highlightClass}`;
         this.positionHighlight(highlight, rect);
         this.container.appendChild(highlight);
         return highlight;
@@ -235,7 +235,7 @@
       // Add the first emoji
       this.addEmoji(normalizedPath, entry, opType);
 
-      console.log('[Vue Viz] Showing indicator for:', filePath, opType, `(${elements.length} elements)`);
+      console.log('[Claude Hands] Showing indicator for:', filePath, opType, `(${elements.length} elements)`);
     },
 
     /**
@@ -244,7 +244,7 @@
     addEmoji(normalizedPath, entry, opType) {
       const emoji = opType === 'read' ? '👁️' : '🤚';
       const span = document.createElement('span');
-      span.className = 'vue-viz-emoji';
+      span.className = 'claude-hands-emoji';
       span.textContent = emoji;
       entry.emojiContainer.appendChild(span);
 
@@ -257,7 +257,7 @@
       entry.emojis.push(emojiEntry);
 
       // Update highlight class on ALL highlights based on latest operation
-      const highlightClass = `vue-viz-highlight ${opType === 'read' ? 'reading' : 'editing'}`;
+      const highlightClass = `claude-hands-highlight ${opType === 'read' ? 'reading' : 'editing'}`;
       entry.highlights.forEach(h => { h.className = highlightClass; });
     },
 
@@ -312,14 +312,14 @@
      */
     createIndicator(filePath) {
       const indicator = document.createElement('div');
-      indicator.className = 'vue-viz-indicator';
+      indicator.className = 'claude-hands-indicator';
 
       const emojiContainer = document.createElement('div');
-      emojiContainer.className = 'vue-viz-emoji-container';
+      emojiContainer.className = 'claude-hands-emoji-container';
       indicator.appendChild(emojiContainer);
 
       const label = document.createElement('div');
-      label.className = 'vue-viz-label';
+      label.className = 'claude-hands-label';
       label.textContent = filePath.split('/').pop();
       indicator.appendChild(label);
 
@@ -351,7 +351,7 @@
 
     createSpeechBubble(text) {
       const bubble = document.createElement('div');
-      bubble.className = 'vue-viz-speech-bubble';
+      bubble.className = 'claude-hands-speech-bubble';
       bubble.textContent = text;
       return bubble;
     },
@@ -435,7 +435,7 @@
 
     init() {
       this.container = document.createElement('div');
-      this.container.id = 'vue-viz-global-container';
+      this.container.id = 'claude-hands-global-container';
       this.container.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999997;';
       document.body.appendChild(this.container);
     },
@@ -460,27 +460,27 @@
         this.showHighlight(opType);
       } else if (this.highlight) {
         // Update highlight class to latest operation
-        this.highlight.className = `vue-viz-global-highlight ${opType === 'read' ? 'reading' : 'editing'}`;
+        this.highlight.className = `claude-hands-global-highlight ${opType === 'read' ? 'reading' : 'editing'}`;
       }
 
       // Create panel if not visible
       if (!this.panel) {
         this.panel = document.createElement('div');
-        this.panel.className = 'vue-viz-global-panel';
+        this.panel.className = 'claude-hands-global-panel';
         this.container.appendChild(this.panel);
       }
 
       // Add file entry
       const fileEntry = document.createElement('div');
-      fileEntry.className = 'vue-viz-global-file-entry';
+      fileEntry.className = 'claude-hands-global-file-entry';
       const emoji = opType === 'read' ? '👁️' : '🤚';
       const filename = filePath.split('/').pop();
-      fileEntry.innerHTML = `<span class="vue-viz-global-emoji">${emoji}</span><span class="vue-viz-global-filename">${filename}</span>`;
+      fileEntry.innerHTML = `<span class="claude-hands-global-emoji">${emoji}</span><span class="claude-hands-global-filename">${filename}</span>`;
 
       let descEl = null;
       if (description && VisualOverlay.speechBubbleEnabled) {
         descEl = document.createElement('div');
-        descEl.className = 'vue-viz-global-description';
+        descEl.className = 'claude-hands-global-description';
         descEl.textContent = description;
         fileEntry.appendChild(descEl);
       }
@@ -490,7 +490,7 @@
       const timeoutId = setTimeout(() => this.removeEntry(normalizedPath), 5000);
       this.entries.set(normalizedPath, { fileEntry, descEl, timeoutId });
 
-      console.log('[Vue Viz] Global overlay for:', filePath, opType);
+      console.log('[Claude Hands] Global overlay for:', filePath, opType);
     },
 
     removeEntry(normalizedPath) {
@@ -511,7 +511,7 @@
 
     showHighlight(opType) {
       this.highlight = document.createElement('div');
-      this.highlight.className = `vue-viz-global-highlight ${opType === 'read' ? 'reading' : 'editing'}`;
+      this.highlight.className = `claude-hands-global-highlight ${opType === 'read' ? 'reading' : 'editing'}`;
       this.container.appendChild(this.highlight);
     },
 
@@ -551,7 +551,7 @@
 
     init() {
       this.badge = document.createElement('div');
-      this.badge.className = 'vue-viz-connection-badge';
+      this.badge.className = 'claude-hands-connection-badge';
       this.badge.style.display = 'none';
       document.body.appendChild(this.badge);
     },
@@ -561,10 +561,10 @@
         clearTimeout(this.hideTimeout);
       }
 
-      this.badge.className = `vue-viz-connection-badge ${connected ? 'connected' : 'disconnected'}`;
+      this.badge.className = `claude-hands-connection-badge ${connected ? 'connected' : 'disconnected'}`;
       this.badge.innerHTML = `
-        <span class="vue-viz-connection-dot"></span>
-        ${connected ? 'Vue Viz Connected' : 'Vue Viz Disconnected'}
+        <span class="claude-hands-connection-dot"></span>
+        ${connected ? 'Claude Hands Connected' : 'Claude Hands Disconnected'}
       `;
       this.badge.style.display = 'flex';
 
@@ -582,7 +582,7 @@
   // ============================================
 
   function handleMessage(message) {
-    console.log('[Vue Viz] Received message:', message.type);
+    console.log('[Claude Hands] Received message:', message.type);
 
     switch (message.type) {
       case 'FILE_OPERATION_START':
@@ -608,7 +608,7 @@
   // ============================================
 
   function init() {
-    console.log('[Vue Viz] Content script initializing...');
+    console.log('[Claude Hands] Content script initializing...');
 
     // Wait for DOM to be ready
     if (document.readyState === 'loading') {
@@ -625,15 +625,15 @@
     ConnectionBadge.init();
 
     // Listen for component scan results from the MAIN-world script
-    window.addEventListener('vue-viz-components-scanned', (event) => {
+    window.addEventListener('claude-hands-components-scanned', (event) => {
       const { components } = event.detail;
-      VueScanner.knownComponents = components;
-      console.log('[Vue Viz] Components available:', components.length, components);
+      ComponentScanner.knownComponents = components;
+      console.log('[Claude Hands] Components available:', components.length, components);
     });
 
     // Request initial scan from the MAIN-world script
     setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('vue-viz-scan-request'));
+      window.dispatchEvent(new CustomEvent('claude-hands-scan-request'));
     }, 2000);
 
     // Listen for messages from service worker
@@ -653,7 +653,7 @@
       }
     });
 
-    console.log('[Vue Viz] Content script ready');
+    console.log('[Claude Hands] Content script ready');
   }
 
   init();

@@ -1,6 +1,7 @@
 // Vue Scanner - Page Context Script (runs in MAIN world)
 // This script has access to Vue's JS properties on DOM elements
 // and communicates component data back to the content script via CustomEvent.
+// Part of Claude Hands — works alongside react-scanner-page.js.
 
 (function() {
   'use strict';
@@ -35,8 +36,8 @@
           results.set(normalizedPath, []);
         }
         // Mark the element with a data attribute so the content script can find it
-        const marker = `vue-viz-${normalizedPath.replace(/[^a-zA-Z0-9]/g, '-')}`;
-        el.setAttribute('data-vue-viz-component', normalizedPath);
+        const marker = `claude-hands-${normalizedPath.replace(/[^a-zA-Z0-9]/g, '-')}`;
+        el.setAttribute('data-claude-hands-component', normalizedPath);
         results.get(normalizedPath).push(normalizedPath);
       }
     }
@@ -94,7 +95,7 @@
 
       if (filePath) {
         const normalizedPath = normalizePath(filePath);
-        el.setAttribute('data-vue-viz-component', normalizedPath);
+        el.setAttribute('data-claude-hands-component', normalizedPath);
         if (!results.has(normalizedPath)) {
           results.set(normalizedPath, []);
         }
@@ -130,7 +131,7 @@
 
     // Dispatch event with component paths so content script knows what's available
     const componentPaths = Array.from(results.keys());
-    window.dispatchEvent(new CustomEvent('vue-viz-components-scanned', {
+    window.dispatchEvent(new CustomEvent('claude-hands-components-scanned', {
       detail: { components: componentPaths }
     }));
 
@@ -138,7 +139,7 @@
   }
 
   // Listen for scan requests from the content script
-  window.addEventListener('vue-viz-scan-request', () => {
+  window.addEventListener('claude-hands-scan-request', () => {
     scan();
   });
 

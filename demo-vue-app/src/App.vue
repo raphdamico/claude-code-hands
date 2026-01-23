@@ -1,13 +1,20 @@
 <script setup>
+import { ref } from 'vue'
 import Header from './components/Header.vue'
 import Sidebar from './components/Sidebar.vue'
 import Card from './components/Card.vue'
 import Button from './components/Button.vue'
+
+const showBanner = ref(true)
 </script>
 
 <template>
   <div class="app">
-    <Header title="Claude Vue Viz Demo" />
+    <div v-if="showBanner" class="top-banner">
+      <span>This is a live demo — edits appear in real-time</span>
+      <button class="banner-dismiss" @click="showBanner = false">✕</button>
+    </div>
+    <Header title="Claude Hands Demo" />
     <div class="app-body">
       <Sidebar />
       <main class="main-content">
@@ -20,30 +27,34 @@ import Button from './components/Button.vue'
           <Card
             title="Components"
             icon="🧩"
-            value="5"
+            value="12"
             trend="up"
-            trend-value="+2 new"
+            trend-value="+3 new"
+            :progress="75"
           />
           <Card
-            title="Read Operations"
+            title="Read Ops"
             icon="👀"
-            value="0"
-            trend="neutral"
-            trend-value="watching"
+            value="847"
+            trend="up"
+            trend-value="+12%"
+            :progress="60"
           />
           <Card
-            title="Edit Operations"
+            title="Edit Ops"
             icon="✍️"
-            value="0"
-            trend="neutral"
-            trend-value="ready"
+            value="23"
+            trend="down"
+            trend-value="-5 today"
+            :progress="30"
           />
           <Card
             title="Connection"
             icon="🔌"
-            value="Active"
+            value="Synced"
             trend="up"
-            trend-value="ws://localhost:9528"
+            trend-value="ws://live"
+            :progress="100"
           />
         </div>
 
@@ -71,9 +82,11 @@ import Button from './components/Button.vue'
           </div>
 
           <div class="button-row">
-            <Button variant="primary">Primary Action</Button>
+            <Button variant="primary" icon="🚀">Primary Action</Button>
             <Button variant="secondary">Secondary</Button>
             <Button variant="outline">Outline</Button>
+            <Button variant="danger" icon="🗑️">Delete</Button>
+            <Button variant="primary" :loading="true">Loading</Button>
           </div>
         </div>
 
@@ -86,6 +99,10 @@ import Button from './components/Button.vue'
             <li>Use Claude Code to read or edit any .vue file in this project</li>
             <li>Watch the visual indicators appear on matching components!</li>
           </ol>
+        </div>
+
+        <div class="footer-bar">
+          Built with Vue 3 + Vite
         </div>
       </main>
     </div>
@@ -118,6 +135,37 @@ body {
   width: 100%;
 }
 
+.top-banner {
+  background: #667eea;
+  color: white;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.banner-dismiss {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.banner-dismiss:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
 .app-body {
   display: flex;
   flex: 1;
@@ -129,6 +177,8 @@ body {
   padding: 24px 28px;
   overflow-y: auto;
   background: #f8f9fb;
+  display: flex;
+  flex-direction: column;
 }
 
 .content-header {
@@ -238,5 +288,15 @@ body {
   font-family: 'SF Mono', Monaco, monospace;
   font-size: 11px;
   color: #667eea;
+}
+
+.footer-bar {
+  margin-top: auto;
+  padding: 14px 0;
+  text-align: center;
+  font-size: 12px;
+  color: #9ca3af;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 20px;
 }
 </style>

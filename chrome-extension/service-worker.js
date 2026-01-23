@@ -1,4 +1,4 @@
-// Claude Vue Viz - Service Worker
+// Claude Hands - Service Worker
 // Maintains WebSocket connection to relay server and broadcasts to content scripts
 
 const WS_URL = 'ws://localhost:9528';
@@ -18,13 +18,13 @@ function connect() {
     return;
   }
 
-  console.log('[Vue Viz] Connecting to relay server...');
+  console.log('[Claude Hands] Connecting to relay server...');
 
   try {
     ws = new WebSocket(WS_URL);
 
     ws.onopen = () => {
-      console.log('[Vue Viz] Connected to relay server');
+      console.log('[Claude Hands] Connected to relay server');
       isConnected = true;
       reconnectAttempt = 0;
       startKeepAlive();
@@ -36,12 +36,12 @@ function connect() {
         const message = JSON.parse(event.data);
         handleMessage(message);
       } catch (err) {
-        console.error('[Vue Viz] Error parsing message:', err);
+        console.error('[Claude Hands] Error parsing message:', err);
       }
     };
 
     ws.onclose = () => {
-      console.log('[Vue Viz] Disconnected from relay server');
+      console.log('[Claude Hands] Disconnected from relay server');
       isConnected = false;
       stopKeepAlive();
       broadcastConnectionStatus(false);
@@ -49,10 +49,10 @@ function connect() {
     };
 
     ws.onerror = (err) => {
-      console.error('[Vue Viz] WebSocket error:', err);
+      console.error('[Claude Hands] WebSocket error:', err);
     };
   } catch (err) {
-    console.error('[Vue Viz] Failed to create WebSocket:', err);
+    console.error('[Claude Hands] Failed to create WebSocket:', err);
     scheduleReconnect();
   }
 }
@@ -60,7 +60,7 @@ function connect() {
 function scheduleReconnect() {
   const delay = RECONNECT_DELAYS[Math.min(reconnectAttempt, RECONNECT_DELAYS.length - 1)];
   reconnectAttempt++;
-  console.log(`[Vue Viz] Reconnecting in ${delay}ms (attempt ${reconnectAttempt})`);
+  console.log(`[Claude Hands] Reconnecting in ${delay}ms (attempt ${reconnectAttempt})`);
   setTimeout(connect, delay);
 }
 
@@ -84,7 +84,7 @@ function stopKeepAlive() {
 
 // Handle messages from relay server
 function handleMessage(message) {
-  console.log('[Vue Viz] Received:', message.type, message.filePath || '');
+  console.log('[Claude Hands] Received:', message.type, message.filePath || '');
 
   switch (message.type) {
     case 'SYNC_STATE':
@@ -128,7 +128,7 @@ async function broadcastToContentScripts(message) {
       }
     }
   } catch (err) {
-    console.error('[Vue Viz] Error broadcasting to tabs:', err);
+    console.error('[Claude Hands] Error broadcasting to tabs:', err);
   }
 }
 
@@ -161,7 +161,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Handle extension icon click to show connection status
 chrome.action.onClicked.addListener((tab) => {
-  console.log('[Vue Viz] Extension icon clicked, connected:', isConnected);
+  console.log('[Claude Hands] Extension icon clicked, connected:', isConnected);
 });
 
 // Start connection on service worker load
@@ -172,7 +172,7 @@ chrome.alarms.create('keepAlive', { periodInMinutes: 0.5 });
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === 'keepAlive') {
     // This just keeps the service worker from being terminated
-    console.log('[Vue Viz] Keepalive ping, connected:', isConnected);
+    console.log('[Claude Hands] Keepalive ping, connected:', isConnected);
     if (!isConnected) {
       connect();
     }

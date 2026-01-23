@@ -2,12 +2,16 @@
 import { ref } from 'vue'
 
 const activeItem = ref('dashboard')
+const searchQuery = ref('')
 
-const menuItems = [
+const mainItems = [
   { id: 'dashboard', icon: '📊', label: 'Dashboard' },
   { id: 'components', icon: '🧩', label: 'Components' },
   { id: 'analytics', icon: '📈', label: 'Analytics' },
-  { id: 'notifications', icon: '🔔', label: 'Notifications' },
+  { id: 'notifications', icon: '🔔', label: 'Notifications', badge: 3 },
+]
+
+const systemItems = [
   { id: 'users', icon: '👥', label: 'Users' },
   { id: 'settings', icon: '⚙️', label: 'Settings' },
 ]
@@ -19,8 +23,28 @@ const menuItems = [
       <span>Menu</span>
     </div>
     <nav class="sidebar-nav">
+      <div class="search-box">
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search..."
+          class="search-input"
+        />
+      </div>
+      <div class="section-label">Main</div>
       <button
-        v-for="item in menuItems"
+        v-for="item in mainItems"
+        :key="item.id"
+        :class="['sidebar-item', { active: activeItem === item.id }]"
+        @click="activeItem = item.id"
+      >
+        <span class="item-icon">{{ item.icon }}</span>
+        <span class="item-label">{{ item.label }}</span>
+        <span v-if="item.badge" class="item-badge">{{ item.badge }}</span>
+      </button>
+      <div class="section-label">System</div>
+      <button
+        v-for="item in systemItems"
         :key="item.id"
         :class="['sidebar-item', { active: activeItem === item.id }]"
         @click="activeItem = item.id"
@@ -31,7 +55,7 @@ const menuItems = [
     </nav>
     <div class="sidebar-footer">
       <div class="status-dot"></div>
-      <span>Vue Viz Active</span>
+      <span>Claude Hands Active</span>
     </div>
   </aside>
 </template>
@@ -65,6 +89,39 @@ const menuItems = [
   gap: 1px;
 }
 
+.search-box {
+  padding: 0 2px 8px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 6px 10px;
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 5px;
+  color: #e5e7eb;
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.search-input::placeholder {
+  color: #6b7280;
+}
+
+.search-input:focus {
+  border-color: #667eea;
+}
+
+.section-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #4b5563;
+  font-weight: 600;
+  padding: 10px 10px 4px;
+}
+
 .sidebar-item {
   display: flex;
   align-items: center;
@@ -92,6 +149,24 @@ const menuItems = [
 
 .item-icon {
   font-size: 14px;
+}
+
+.item-label {
+  flex: 1;
+}
+
+.item-badge {
+  background: #ef4444;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
 }
 
 .sidebar-footer {

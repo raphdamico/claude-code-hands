@@ -1,5 +1,6 @@
 chrome-extension/
 demo-vue-app/
+demo-react-app/
 hooks/
 .claude/
 firebase-debug.log

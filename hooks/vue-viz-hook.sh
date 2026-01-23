@@ -1,5 +1,5 @@
 #!/bin/bash
-# Vue Viz Hook - Sends file operations to local relay server
+# Claude Hands Hook - Sends file operations to local relay server
 # Install: Copy to ~/.claude/hooks/ and configure in settings.json
 
 RELAY_URL="http://localhost:9527/event"

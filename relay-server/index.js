@@ -182,14 +182,17 @@ function broadcast(message) {
 
 // Start servers
 httpServer.listen(HTTP_PORT, () => {
+  const W = 48;
+  const bar = '═'.repeat(W);
+  const pad = (s) => '║' + s.padEnd(W) + '║';
   console.log(`
-╔════════════════════════════════════════════════╗
-║       Claude Vue Viz - Relay Server            ║
-╠════════════════════════════════════════════════╣
-║  HTTP endpoint: http://localhost:${HTTP_PORT}/event   ║
-║  WebSocket:     ws://localhost:${WS_PORT}             ║
-║  Status:        http://localhost:${HTTP_PORT}/status  ║
-╚════════════════════════════════════════════════╝
+╔${bar}╗
+${pad('       Claude Hands - Relay Server')}
+╠${bar}╣
+${pad(`  HTTP endpoint: http://localhost:${HTTP_PORT}/event`)}
+${pad(`  WebSocket:     ws://localhost:${WS_PORT}`)}
+${pad(`  Status:        http://localhost:${HTTP_PORT}/status`)}
+╚${bar}╝
 `);
 });
 

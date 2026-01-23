@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Claude Vue Viz",
+  "name": "Claude Hands",
   "version": "1.0.0",
-  "description": "Visualizes which Vue components Claude Code is reading or editing",
+  "description": "Visualizes which components Claude Code is reading or editing (Vue + React)",
   "permissions": [
     "activeTab",
     "scripting",
@@ -32,6 +32,15 @@
         "http://127.0.0.1:*/*"
       ],
       "js": ["vue-scanner-page.js"],
+      "run_at": "document_idle",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "http://localhost:*/*",
+        "http://127.0.0.1:*/*"
+      ],
+      "js": ["react-scanner-page.js"],
       "run_at": "document_idle",
       "world": "MAIN"
     }

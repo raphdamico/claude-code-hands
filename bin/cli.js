@@ -29,14 +29,14 @@ switch (command) {
       console.log(`  Active operations: ${data.activeOperations}`);
     } catch {
       console.log('Relay server is not running');
-      console.log('  Start it with: npx claude-vue-viz start');
+      console.log('  Start it with: npx claude-hands start');
       process.exitCode = 1;
     }
     break;
   }
   default:
     console.log(`
-claude-vue-viz — See what Claude Code is doing to your Vue app
+claude-hands — See what Claude Code is doing to your app (Vue + React)
 
 Commands:
   setup    Install hook script and configure Claude settings
@@ -44,8 +44,8 @@ Commands:
   status   Check if the relay server is running
 
 Usage:
-  npx claude-vue-viz setup
-  npx claude-vue-viz start
+  npx claude-hands setup
+  npx claude-hands start
 `);
     if (command) process.exitCode = 1;
 }
