@@ -140,6 +140,7 @@
           if (!this.speechBubbleEnabled) {
             for (const [, entry] of this.overlays) {
               if (entry.speechBubble) {
+                this.cleanupBubble(entry.speechBubble);
                 entry.speechBubble.remove();
                 entry.speechBubble = null;
               }
@@ -294,6 +295,7 @@
             entry.highlights.forEach(h => h.remove());
             entry.indicator.remove();
             if (entry.speechBubble) {
+              this.cleanupBubble(entry.speechBubble);
               entry.speechBubble.remove();
             }
             this.overlays.delete(normalizedPath);
@@ -354,8 +356,57 @@
     createSpeechBubble(text) {
       const bubble = document.createElement('div');
       bubble.className = 'claude-hands-speech-bubble';
-      bubble.textContent = text;
+      this.streamText(bubble, text);
       return bubble;
+    },
+
+    streamText(bubble, text) {
+      // Clear any existing stream
+      if (bubble._streamInterval) clearInterval(bubble._streamInterval);
+      if (bubble._cursorInterval) clearInterval(bubble._cursorInterval);
+
+      const textSpan = document.createElement('span');
+      const cursorSpan = document.createElement('span');
+      cursorSpan.className = 'claude-hands-cursor';
+
+      const spinChars = ['|', '/', '\u2014', '\\'];
+      let spinIdx = 0;
+      let charIdx = 0;
+
+      bubble.textContent = '';
+      bubble.appendChild(textSpan);
+      bubble.appendChild(cursorSpan);
+
+      // Spin the cursor
+      cursorSpan.textContent = spinChars[0];
+      bubble._cursorInterval = setInterval(() => {
+        spinIdx = (spinIdx + 1) % spinChars.length;
+        cursorSpan.textContent = spinChars[spinIdx];
+      }, 80);
+
+      // Stream characters in
+      bubble._streamInterval = setInterval(() => {
+        if (charIdx < text.length) {
+          textSpan.textContent += text[charIdx];
+          charIdx++;
+        } else {
+          clearInterval(bubble._streamInterval);
+          bubble._streamInterval = null;
+          // Keep cursor spinning for a moment, then hide it
+          setTimeout(() => {
+            if (bubble._cursorInterval) {
+              clearInterval(bubble._cursorInterval);
+              bubble._cursorInterval = null;
+            }
+            cursorSpan.textContent = '';
+          }, 600);
+        }
+      }, 30);
+    },
+
+    cleanupBubble(bubble) {
+      if (bubble._streamInterval) clearInterval(bubble._streamInterval);
+      if (bubble._cursorInterval) clearInterval(bubble._cursorInterval);
     },
 
     updateSpeechBubble(entry, text) {
@@ -367,8 +418,8 @@
         this.positionSpeechBubble(entry.speechBubble, rect);
         this.container.appendChild(entry.speechBubble);
       } else {
-        // Update existing bubble text
-        entry.speechBubble.textContent = text;
+        // Restart streaming with new text
+        this.streamText(entry.speechBubble, text);
       }
     },
 
@@ -412,7 +463,10 @@
         entry.emojis.forEach(e => clearTimeout(e.timeoutId));
         entry.highlights.forEach(h => h.remove());
         entry.indicator.remove();
-        if (entry.speechBubble) entry.speechBubble.remove();
+        if (entry.speechBubble) {
+          this.cleanupBubble(entry.speechBubble);
+          entry.speechBubble.remove();
+        }
       }
       this.overlays.clear();
       GlobalOverlay.clear();
@@ -456,7 +510,7 @@
         existing.timeoutId = setTimeout(() => this.removeEntry(normalizedPath), 5000);
         // Update description if provided and bubbles enabled
         if (description && existing.descEl && VisualOverlay.speechBubbleEnabled) {
-          existing.descEl.textContent = description;
+          VisualOverlay.streamText(existing.descEl, description);
         }
         return;
       }
@@ -486,8 +540,8 @@
       if (description && VisualOverlay.speechBubbleEnabled) {
         descEl = document.createElement('div');
         descEl.className = 'claude-hands-global-description';
-        descEl.textContent = description;
         fileEntry.appendChild(descEl);
+        VisualOverlay.streamText(descEl, description);
       }
 
       this.panel.appendChild(fileEntry);
@@ -502,6 +556,7 @@
       const entry = this.entries.get(normalizedPath);
       if (!entry) return;
 
+      if (entry.descEl) VisualOverlay.cleanupBubble(entry.descEl);
       entry.fileEntry.classList.add('exiting');
       setTimeout(() => {
         entry.fileEntry.remove();
@@ -538,6 +593,7 @@
     clear() {
       for (const [, entry] of this.entries) {
         clearTimeout(entry.timeoutId);
+        if (entry.descEl) VisualOverlay.cleanupBubble(entry.descEl);
         entry.fileEntry.remove();
       }
       this.entries.clear();

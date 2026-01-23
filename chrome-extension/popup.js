@@ -85,11 +85,13 @@ setInterval(() => {
 // Demo Mode
 // ============================================
 
-const demoBtn = document.getElementById('demo-btn');
+const demoVueBtn = document.getElementById('demo-vue-btn');
+const demoReactBtn = document.getElementById('demo-react-btn');
 let demoRunning = false;
+let demoActiveBtn = null;
 let demoTimeouts = [];
 
-const demoFiles = [
+const demoVueFiles = [
   { filePath: 'src/components/Card.vue', operation: 'read', selector: '.card', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
   { filePath: 'src/assets/styles.css', operation: 'edit', description: 'Editing: .card { border-radius: 8px;...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
   { filePath: 'src/components/Header.vue', operation: 'read', selector: '.header', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
@@ -100,20 +102,32 @@ const demoFiles = [
   { filePath: 'src/App.vue', operation: 'read', selector: '.app', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
 ];
 
+const demoReactFiles = [
+  { filePath: 'src/components/Header.jsx', operation: 'read', selector: 'header', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/components/Card.jsx', operation: 'edit', selector: 'main > div', description: 'Editing: <h3>{title}</h3>...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
+  { filePath: 'src/components/Sidebar.jsx', operation: 'read', selector: 'aside', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/App.jsx', operation: 'read', selector: '#root > div', description: 'Reading component...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/main.jsx', operation: 'read', description: 'Reading script...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+  { filePath: 'src/components/Card.jsx', operation: 'edit', selector: 'main > div', description: 'Editing: style={{ borderRadius...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
+  { filePath: 'src/components/Header.jsx', operation: 'edit', selector: 'header', description: 'Editing: <nav style={{ marginLeft...', visual: { emoji: '\u{1F91A}', cssClass: 'editing' } },
+  { filePath: 'vite.config.js', operation: 'read', description: 'Reading config...', visual: { emoji: '\u{1F441}\uFE0F', cssClass: 'reading' } },
+];
+
 function sendToContentScript(tabId, message) {
   chrome.tabs.sendMessage(tabId, message);
 }
 
-function runDemo(tabId) {
+function runDemo(tabId, files, btn) {
   demoRunning = true;
-  demoBtn.textContent = '⏹ Stop Demo';
-  demoBtn.classList.add('active');
+  demoActiveBtn = btn;
+  btn.textContent = '\u23F9 Stop';
+  btn.classList.add('active');
 
   let delay = 0;
   const stagger = 1500;
   const holdDuration = 3000;
 
-  demoFiles.forEach((file, i) => {
+  files.forEach((file) => {
     // Start operation
     const startTimeout = setTimeout(() => {
       sendToContentScript(tabId, {
@@ -155,8 +169,13 @@ function stopDemo() {
   demoTimeouts.forEach(t => clearTimeout(t));
   demoTimeouts = [];
   demoRunning = false;
-  demoBtn.textContent = '▶ Run Demo';
-  demoBtn.classList.remove('active');
+
+  if (demoActiveBtn) {
+    const isVue = demoActiveBtn === demoVueBtn;
+    demoActiveBtn.textContent = isVue ? '\u25B6 Vue Demo' : '\u25B6 React Demo';
+    demoActiveBtn.classList.remove('active');
+    demoActiveBtn = null;
+  }
 
   // Clear all overlays on the active tab by syncing empty state
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -169,7 +188,7 @@ function stopDemo() {
   });
 }
 
-demoBtn.addEventListener('click', () => {
+function handleDemoClick(btn, files) {
   if (demoRunning) {
     stopDemo();
     return;
@@ -177,7 +196,10 @@ demoBtn.addEventListener('click', () => {
 
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs[0]) {
-      runDemo(tabs[0].id);
+      runDemo(tabs[0].id, files, btn);
     }
   });
-});
+}
+
+demoVueBtn.addEventListener('click', () => handleDemoClick(demoVueBtn, demoVueFiles));
+demoReactBtn.addEventListener('click', () => handleDemoClick(demoReactBtn, demoReactFiles));
