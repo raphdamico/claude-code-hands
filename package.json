@@ -4,7 +4,7 @@
   "description": "Visualize which components Claude Code is reading and editing, directly in the browser (Vue + React)",
   "type": "module",
   "bin": {
-    "claude-hands": "./bin/cli.js"
+    "claude-hands": "bin/cli.js"
   },
   "files": [
     "bin/",
@@ -25,5 +25,10 @@
     "visualization",
     "developer-tools"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/raphdamico/claude-code-hands"
+  },
+  "homepage": "https://github.com/raphdamico/claude-code-hands#readme"
 }
