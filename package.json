@@ -6,6 +6,9 @@
   "bin": {
     "claude-hands": "bin/cli.js"
   },
+  "scripts": {
+    "test": "node --test 'test/*.test.js'"
+  },
   "files": [
     "bin/",
     "lib/",

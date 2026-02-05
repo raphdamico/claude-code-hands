@@ -21,6 +21,11 @@ switch (command) {
     start(root);
     break;
   }
+  case 'uninstall': {
+    const { uninstall } = await import(join(root, 'lib', 'uninstall.js'));
+    await uninstall();
+    break;
+  }
   case 'status': {
     try {
       const res = await fetch(`http://localhost:${config.relay.httpPort}/status`);
@@ -40,9 +45,10 @@ switch (command) {
 claude-hands — See what Claude Code is doing to your app (Vue + React)
 
 Commands:
-  setup    Install hook script and configure Claude settings
-  start    Launch the relay server
-  status   Check if the relay server is running
+  setup      Install hook script and configure Claude settings
+  uninstall  Remove hook files and settings entries
+  start      Launch the relay server
+  status     Check if the relay server is running
 
 Usage:
   npx claude-hands setup

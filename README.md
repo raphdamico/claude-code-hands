@@ -47,11 +47,13 @@ Non-frontend files (anything without a `.vue`, `.jsx`, `.tsx`, `.js`, `.ts`, `.c
 - Node.js 18+
 - Chrome browser
 
-### 1. Load the Chrome Extension
+### 1. Install the Chrome Extension
+
+Download `chrome-extension.zip` from the [latest release](https://github.com/raphdamico/claude-code-hands/releases/latest) and unzip it. Then:
 
 1. Open Chrome → `chrome://extensions/`
 2. Enable **Developer mode** (toggle in top right)
-3. Click **Load unpacked** → select the `chrome-extension/` folder from this repo
+3. Click **Load unpacked** → select the unzipped folder
 
 ### 2. Set up the CLI
 
@@ -134,6 +136,14 @@ cd relay-server && npm run dev
 5. Use Claude Code to read/edit component files — overlays should appear
 6. Verify overlays auto-fade after ~4 seconds
 7. Verify the popup shows active operations while they're in progress
+
+## Uninstalling
+
+```bash
+npx claude-hands uninstall
+```
+
+This removes the hook files from `~/.claude/hooks/` and cleans up the PreToolUse/PostToolUse entries in `~/.claude/settings.json`. The Chrome extension must be removed manually from `chrome://extensions`.
 
 ## Technical Notes
 

@@ -178,6 +178,83 @@ describe('mergeHooksIntoSettings', () => {
     assert.ok(settings.hooks.PreToolUse.length > 0);
   });
 
+  it('updates stale matcher on re-run', async () => {
+    // Simulate an old install with a narrower matcher
+    const oldSettings = {
+      hooks: {
+        PreToolUse: [{ matcher: 'Read|Edit', hooks: [{ type: 'command', command: HOOK_PATH }] }],
+        PostToolUse: [{ matcher: 'Read|Edit', hooks: [{ type: 'command', command: HOOK_PATH }] }],
+      }
+    };
+    await writeFile(settingsPath, JSON.stringify(oldSettings));
+
+    const result = await mergeHooksIntoSettings(settingsPath, HOOK_PATH);
+    assert.equal(result.skipped, false);
+
+    const settings = JSON.parse(await readFile(settingsPath, 'utf8'));
+    // Matcher should be updated, not duplicated
+    assert.equal(settings.hooks.PreToolUse.length, 1);
+    assert.equal(settings.hooks.PostToolUse.length, 1);
+    // Matcher should contain all current tools
+    assert.ok(settings.hooks.PreToolUse[0].matcher.includes('Read'));
+    assert.ok(settings.hooks.PreToolUse[0].matcher.includes('Write'));
+    assert.ok(settings.hooks.PreToolUse[0].matcher.includes('Glob'));
+    assert.ok(settings.hooks.PreToolUse[0].matcher.includes('Grep'));
+  });
+
+  it('throws on top-level array', async () => {
+    await writeFile(settingsPath, JSON.stringify([1, 2, 3]));
+
+    await assert.rejects(
+      () => mergeHooksIntoSettings(settingsPath, HOOK_PATH),
+      (err) => {
+        assert.ok(err.message.includes('invalid top-level'), `Expected "invalid top-level" in: ${err.message}`);
+        assert.ok(err.message.includes('array'), `Expected "array" in: ${err.message}`);
+        return true;
+      }
+    );
+  });
+
+  it('preserves other hooks when updating stale matcher', async () => {
+    const oldSettings = {
+      hooks: {
+        PreToolUse: [
+          { matcher: 'Bash', hooks: [{ type: 'command', command: '/other/hook' }] },
+          { matcher: 'Read|Edit', hooks: [{ type: 'command', command: HOOK_PATH }] },
+        ],
+        PostToolUse: [
+          { matcher: 'Read|Edit', hooks: [{ type: 'command', command: HOOK_PATH }] },
+        ],
+      }
+    };
+    await writeFile(settingsPath, JSON.stringify(oldSettings));
+
+    await mergeHooksIntoSettings(settingsPath, HOOK_PATH);
+
+    const settings = JSON.parse(await readFile(settingsPath, 'utf8'));
+    // Other tool's entry preserved
+    assert.equal(settings.hooks.PreToolUse.length, 2);
+    assert.equal(settings.hooks.PreToolUse[0].hooks[0].command, '/other/hook');
+    assert.equal(settings.hooks.PreToolUse[0].matcher, 'Bash');
+  });
+
+  it('no backup on skip when matcher already current', async () => {
+    await writeFile(settingsPath, JSON.stringify({}));
+
+    // First run creates settings + backup
+    await mergeHooksIntoSettings(settingsPath, HOOK_PATH);
+    const filesAfterFirst = await readdir(tmpDir);
+    const backupsFirst = filesAfterFirst.filter(f => f.startsWith('settings.json.backup.'));
+    assert.equal(backupsFirst.length, 1);
+
+    // Second run should skip — no new backup
+    const result = await mergeHooksIntoSettings(settingsPath, HOOK_PATH);
+    assert.equal(result.skipped, true);
+    const filesAfterSecond = await readdir(tmpDir);
+    const backupsSecond = filesAfterSecond.filter(f => f.startsWith('settings.json.backup.'));
+    assert.equal(backupsSecond.length, 1, 'Should still have only 1 backup after skip');
+  });
+
   it('preserves existing hook entries from other tools', async () => {
     const existing = {
       hooks: {

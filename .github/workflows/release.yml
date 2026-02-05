@@ -14,9 +14,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Zip chrome extension
-        run: cd chrome-extension && zip -r ../chrome-extension.zip .
+        run: cd chrome-extension && zip -r ../claude-hands-chrome-extension.zip .
 
       - name: Attach zip to release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "${{ github.event.release.tag_name }}" chrome-extension.zip
+        run: gh release upload "${{ github.event.release.tag_name }}" claude-hands-chrome-extension.zip
