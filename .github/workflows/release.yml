@@ -1,0 +1,22 @@
+name: Release Chrome Extension
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  attach-extension-zip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Zip chrome extension
+        run: cd chrome-extension && zip -r ../chrome-extension.zip .
+
+      - name: Attach zip to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.event.release.tag_name }}" chrome-extension.zip
