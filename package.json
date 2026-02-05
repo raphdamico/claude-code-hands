@@ -1,6 +1,6 @@
 {
   "name": "claude-hands",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Visualize which components Claude Code is reading and editing, directly in the browser (Vue + React)",
   "type": "module",
   "bin": {
